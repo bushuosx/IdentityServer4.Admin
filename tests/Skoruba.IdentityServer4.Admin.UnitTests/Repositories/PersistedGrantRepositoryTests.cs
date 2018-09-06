@@ -38,7 +38,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Repositories
 
                 //Generate persisted grant
                 var persistedGrantKey = Guid.NewGuid().ToString();
-                var persistedGrant = PersistedGrantMock.GenerateRandomPersistedGrant(persistedGrantKey);
+                var persistedGrant = PersistedGrantMock.GenerateRandomPersistedGrant(persistedGrantKey,Guid.Empty);
 
                 //Try add new persisted grant
                 await context.PersistedGrants.AddAsync(persistedGrant);
@@ -61,7 +61,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Repositories
 
                 //Generate persisted grant
                 var persistedGrantKey = Guid.NewGuid().ToString();
-                var persistedGrant = PersistedGrantMock.GenerateRandomPersistedGrant(persistedGrantKey);
+                var persistedGrant = PersistedGrantMock.GenerateRandomPersistedGrant(persistedGrantKey,Guid.Empty);
 
                 //Try add new persisted grant
                 await context.PersistedGrants.AddAsync(persistedGrant);
@@ -84,7 +84,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Repositories
             {
                 var persistedGrantRepository = new PersistedGrantRepository(context);
 
-                var subjectId = 1;
+                var subjectId = Guid.Empty;
 
                 for (var i = 0; i < 4; i++)
                 {

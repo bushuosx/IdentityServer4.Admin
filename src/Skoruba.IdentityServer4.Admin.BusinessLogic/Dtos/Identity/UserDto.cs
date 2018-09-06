@@ -4,7 +4,7 @@ using Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Identity.Base;
 
 namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Identity
 {
-    public class UserDto : BaseUserDto<int>
+    public class UserDto : BaseUserDto<Guid>
     {        
         [Required]
         public string UserName { get; set; }

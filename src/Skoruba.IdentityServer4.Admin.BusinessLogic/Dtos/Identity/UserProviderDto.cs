@@ -1,8 +1,9 @@
 ﻿using Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Identity.Base;
+using System;
 
 namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Identity
 {
-    public class UserProviderDto : BaseUserProviderDto<int>
+    public class UserProviderDto : BaseUserProviderDto<Guid>
     {
         public string ProviderKey { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Grant;
 
 namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
@@ -9,6 +10,6 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
         Task<PersistedGrantsDto> GetPersitedGrantsByUser(string subjectId, int page = 1, int pageSize = 10);
         Task<PersistedGrantDto> GetPersitedGrantAsync(string key);
         Task<int> DeletePersistedGrantAsync(string key);
-        Task<int> DeletePersistedGrantsAsync(int userId);
+        Task<int> DeletePersistedGrantsAsync(Guid userId);
     }
 }

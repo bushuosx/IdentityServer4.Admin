@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Grant
 {
@@ -9,7 +10,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Grant
 			PersistedGrants = new List<PersistedGrantDto>();
 		}
 
-	    public int SubjectId { get; set; }
+	    public Guid SubjectId { get; set; }
 
 		public int TotalCount { get; set; }
 

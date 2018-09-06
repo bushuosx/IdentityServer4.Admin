@@ -1,6 +1,8 @@
-﻿namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
+﻿using System;
+
+namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
 {
-    public interface IIdentityService : IBaseIdentityService<int, int, int>
+    public interface IIdentityService : IBaseIdentityService<Guid, Guid, int>
     {        
     }
 }

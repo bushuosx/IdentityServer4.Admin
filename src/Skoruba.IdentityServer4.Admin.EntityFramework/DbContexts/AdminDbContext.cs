@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using IdentityServer4.EntityFramework.Entities;
 using IdentityServer4.EntityFramework.Extensions;
 using IdentityServer4.EntityFramework.Interfaces;
@@ -11,7 +12,7 @@ using Skoruba.IdentityServer4.Admin.EntityFramework.Entities.Identity;
 
 namespace Skoruba.IdentityServer4.Admin.EntityFramework.DbContexts
 {
-    public class AdminDbContext : IdentityDbContext<UserIdentity, UserIdentityRole, int, UserIdentityUserClaim, UserIdentityUserRole, UserIdentityUserLogin, UserIdentityRoleClaim, UserIdentityUserToken>,
+    public class AdminDbContext : IdentityDbContext<UserIdentity, UserIdentityRole, Guid, UserIdentityUserClaim, UserIdentityUserRole, UserIdentityUserLogin, UserIdentityRoleClaim, UserIdentityUserToken>,
         IConfigurationDbContext, IPersistedGrantDbContext
     {
         private readonly ConfigurationStoreOptions _storeOptions;
@@ -81,14 +82,14 @@ namespace Skoruba.IdentityServer4.Admin.EntityFramework.DbContexts
 
         private void ConfigureIdentityContext(ModelBuilder builder)
         {
-            builder.Entity<UserIdentityRole>().ToTable(TableConsts.IdentityRoles);
-            builder.Entity<UserIdentityRoleClaim>().ToTable(TableConsts.IdentityRoleClaims);
-            builder.Entity<UserIdentityUserRole>().ToTable(TableConsts.IdentityUserRoles);
+            //builder.Entity<UserIdentityRole>().ToTable(TableConsts.IdentityRoles);
+            //builder.Entity<UserIdentityRoleClaim>().ToTable(TableConsts.IdentityRoleClaims);
+            //builder.Entity<UserIdentityUserRole>().ToTable(TableConsts.IdentityUserRoles);
 
-            builder.Entity<UserIdentity>().ToTable(TableConsts.IdentityUsers);
-            builder.Entity<UserIdentityUserLogin>().ToTable(TableConsts.IdentityUserLogins);
-            builder.Entity<UserIdentityUserClaim>().ToTable(TableConsts.IdentityUserClaims);
-            builder.Entity<UserIdentityUserToken>().ToTable(TableConsts.IdentityUserTokens);
+            //builder.Entity<UserIdentity>().ToTable(TableConsts.IdentityUsers);
+            //builder.Entity<UserIdentityUserLogin>().ToTable(TableConsts.IdentityUserLogins);
+            //builder.Entity<UserIdentityUserClaim>().ToTable(TableConsts.IdentityUserClaims);
+            //builder.Entity<UserIdentityUserToken>().ToTable(TableConsts.IdentityUserTokens);
         }
     }
 }

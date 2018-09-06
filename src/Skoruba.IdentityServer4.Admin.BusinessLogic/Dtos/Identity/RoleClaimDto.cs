@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Identity.Base;
 
 namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Identity
 {
-    public class RoleClaimDto : BaseRoleClaimDto<int, int>
+    public class RoleClaimDto : BaseRoleClaimDto<Guid, int>
     {
         [Required]
         public string ClaimType { get; set; }

@@ -28,7 +28,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             var pagedList = new PagedList<PersistedGrantDataView>();
 
             var persistedGrantByUsers = (from pe in _dbContext.PersistedGrants
-                                         join us in _dbContext.Users on Convert.ToInt32(pe.SubjectId) equals us.Id into per
+                                         join us in _dbContext.Users on pe.SubjectId equals us.Id.ToString() into per
                                          from us in per.DefaultIfEmpty()
                                          select new PersistedGrantDataView
                                          {
@@ -92,7 +92,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return _dbContext.PersistedGrants.AnyAsync(x => x.SubjectId == subjectId);
         }
 
-        public async Task<int> DeletePersistedGrantsAsync(int userId)
+        public async Task<int> DeletePersistedGrantsAsync(Guid userId)
         {
             var grants = await _dbContext.PersistedGrants.Where(x => x.SubjectId == userId.ToString()).ToListAsync();
 

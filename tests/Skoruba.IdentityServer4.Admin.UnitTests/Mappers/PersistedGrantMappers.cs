@@ -14,7 +14,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
             var persistedGrantKey = Guid.NewGuid().ToString();
 
             //Generate entity
-            var persistedGrant = PersistedGrantMock.GenerateRandomPersistedGrant(persistedGrantKey);
+            var persistedGrant = PersistedGrantMock.GenerateRandomPersistedGrant(persistedGrantKey,Guid.Empty);
 
             //Try map to DTO
             var persistedGrantDto = persistedGrant.ToModel();

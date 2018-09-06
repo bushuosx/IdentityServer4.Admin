@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Grant;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.ExceptionHandling;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.Mappers;
@@ -52,7 +53,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return await _persistedGrantRepository.DeletePersistedGrantAsync(key);
         }
 
-        public async Task<int> DeletePersistedGrantsAsync(int userId)
+        public async Task<int> DeletePersistedGrantsAsync(Guid userId)
         {
             return await _persistedGrantRepository.DeletePersistedGrantsAsync(userId);
         }

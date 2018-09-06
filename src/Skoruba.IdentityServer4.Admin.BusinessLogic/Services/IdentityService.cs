@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -24,7 +25,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             _identityServiceResources = identityServiceResources;
         }
 
-        public async Task<bool> ExistsUserAsync(int userId)
+        public async Task<bool> ExistsUserAsync(Guid userId)
         {
             var exists = await _identityRepository.ExistsUserAsync(userId);
             if (!exists) throw new UserFriendlyErrorPageException(string.Format(_identityServiceResources.UserDoesNotExist().Description, userId), _identityServiceResources.UserDoesNotExist().Description);
@@ -32,7 +33,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return true;
         }
 
-        public async Task<bool> ExistsRoleAsync(int roleId)
+        public async Task<bool> ExistsRoleAsync(Guid roleId)
         {
             var exists = await _identityRepository.ExistsRoleAsync(roleId);
             if (!exists) throw new UserFriendlyErrorPageException(string.Format(_identityServiceResources.RoleDoesNotExist().Description, roleId), _identityServiceResources.RoleDoesNotExist().Description);
@@ -142,7 +143,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return HandleIdentityError(identityResult, _identityServiceResources.UserRoleCreateFailed().Description, _identityServiceResources.IdentityErrorKey().Description, userRolesDto);
         }
 
-        public async Task<UserRolesDto> BuildUserRolesViewModel(int id, int? page)
+        public async Task<UserRolesDto> BuildUserRolesViewModel(Guid id, int? page)
         {
             var roles = await GetRolesAsync();
             var userRoles = await GetUserRolesAsync(id, page ?? 1);
@@ -152,7 +153,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return userRoles;
         }
 
-        public async Task<UserRolesDto> GetUserRolesAsync(int userId, int page = 1, int pageSize = 10)
+        public async Task<UserRolesDto> GetUserRolesAsync(Guid userId, int page = 1, int pageSize = 10)
         {
             var userExists = await _identityRepository.ExistsUserAsync(userId);
             if (!userExists) throw new UserFriendlyErrorPageException(string.Format(_identityServiceResources.UserDoesNotExist().Description, userId), _identityServiceResources.UserDoesNotExist().Description);
@@ -170,7 +171,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return HandleIdentityError(identityResult, _identityServiceResources.UserRoleDeleteFailed().Description, _identityServiceResources.IdentityErrorKey().Description, role);
         }
 
-        public async Task<UserClaimsDto> GetUserClaimsAsync(int userId, int page = 1, int pageSize = 10)
+        public async Task<UserClaimsDto> GetUserClaimsAsync(Guid userId, int page = 1, int pageSize = 10)
         {
             var userExists = await _identityRepository.ExistsUserAsync(userId);
             if (!userExists) throw new UserFriendlyErrorPageException(string.Format(_identityServiceResources.UserDoesNotExist().Description, userId), _identityServiceResources.UserDoesNotExist().Description);
@@ -181,7 +182,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return claimDtos;
         }
 
-        public async Task<UserClaimsDto> GetUserClaimAsync(int userId, int claimId)
+        public async Task<UserClaimsDto> GetUserClaimAsync(Guid userId, int claimId)
         {
             var userExists = await _identityRepository.ExistsUserAsync(userId);
             if (!userExists) throw new UserFriendlyErrorPageException(string.Format(_identityServiceResources.UserDoesNotExist().Description, userId), _identityServiceResources.UserDoesNotExist().Description);
@@ -207,7 +208,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return await _identityRepository.DeleteUserClaimsAsync(claim.UserId, claim.ClaimId);
         }
 
-        public async Task<UserProvidersDto> GetUserProvidersAsync(int userId)
+        public async Task<UserProvidersDto> GetUserProvidersAsync(Guid userId)
         {
             var userExists = await _identityRepository.ExistsUserAsync(userId);
             if (!userExists) throw new UserFriendlyErrorPageException(string.Format(_identityServiceResources.UserDoesNotExist().Description, userId), _identityServiceResources.UserDoesNotExist().Description);
@@ -226,7 +227,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return HandleIdentityError(identityResult, _identityServiceResources.UserProviderDeleteFailed().Description, _identityServiceResources.IdentityErrorKey().Description, provider);
         }
 
-        public async Task<UserProviderDto> GetUserProviderAsync(int userId, string providerKey)
+        public async Task<UserProviderDto> GetUserProviderAsync(Guid userId, string providerKey)
         {
             var userExists = await _identityRepository.ExistsUserAsync(userId);
             if (!userExists) throw new UserFriendlyErrorPageException(string.Format(_identityServiceResources.UserDoesNotExist().Description, userId), _identityServiceResources.UserDoesNotExist().Description);
@@ -257,7 +258,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return HandleIdentityError(identityResult, _identityServiceResources.RoleClaimsCreateFailed().Description, _identityServiceResources.IdentityErrorKey().Description, claimsDto);
         }
 
-        public async Task<RoleClaimsDto> GetRoleClaimsAsync(int roleId, int page = 1, int pageSize = 10)
+        public async Task<RoleClaimsDto> GetRoleClaimsAsync(Guid roleId, int page = 1, int pageSize = 10)
         {
             var roleExists = await _identityRepository.ExistsRoleAsync(roleId);
             if (!roleExists) throw new UserFriendlyErrorPageException(string.Format(_identityServiceResources.RoleDoesNotExist().Description, roleId), _identityServiceResources.RoleDoesNotExist().Description);
@@ -268,7 +269,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return roleClaimDtos;
         }
 
-        public async Task<RoleClaimsDto> GetRoleClaimAsync(int roleId, int claimId)
+        public async Task<RoleClaimsDto> GetRoleClaimAsync(Guid roleId, int claimId)
         {
             var roleExists = await _identityRepository.ExistsRoleAsync(roleId);
             if (!roleExists) throw new UserFriendlyErrorPageException(string.Format(_identityServiceResources.RoleDoesNotExist().Description, roleId), _identityServiceResources.RoleDoesNotExist().Description);

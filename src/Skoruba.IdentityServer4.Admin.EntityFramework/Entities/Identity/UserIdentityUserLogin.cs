@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System;
 
 namespace Skoruba.IdentityServer4.Admin.EntityFramework.Entities.Identity
 {
-    public class UserIdentityUserLogin : IdentityUserLogin<int>
+    public class UserIdentityUserLogin : IdentityUserLogin<Guid>
     {
         
     }

@@ -32,12 +32,12 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             _roleManager = roleManager;
         }
 
-        public Task<bool> ExistsUserAsync(int userId)
+        public Task<bool> ExistsUserAsync(Guid userId)
         {
             return _dbContext.Users.AnyAsync(x => x.Id == userId);
         }
 
-        public Task<bool> ExistsRoleAsync(int roleId)
+        public Task<bool> ExistsRoleAsync(Guid roleId)
         {
             return _dbContext.Roles.AnyAsync(x => x.Id == roleId);
         }
@@ -120,7 +120,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return await _userManager.UpdateAsync(userIdentity);            
         }
 
-        public async Task<IdentityResult> CreateUserRoleAsync(int userId, int roleId)
+        public async Task<IdentityResult> CreateUserRoleAsync(Guid userId, Guid roleId)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
             var selectRole = await _roleManager.FindByIdAsync(roleId.ToString());
@@ -128,7 +128,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return await _userManager.AddToRoleAsync(user, selectRole.Name);            
         }
 
-        public async Task<PagedList<UserIdentityRole>> GetUserRolesAsync(int userId, int page = 1, int pageSize = 10)
+        public async Task<PagedList<UserIdentityRole>> GetUserRolesAsync(Guid userId, int page = 1, int pageSize = 10)
         {
             var pagedList = new PagedList<UserIdentityRole>();
             var roles = from r in _dbContext.Roles
@@ -147,7 +147,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return pagedList;
         }
 
-        public async Task<IdentityResult> DeleteUserRoleAsync(int userId, int roleId)
+        public async Task<IdentityResult> DeleteUserRoleAsync(Guid userId, Guid roleId)
         {
             var role = await _roleManager.FindByIdAsync(roleId.ToString());
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -155,7 +155,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return await _userManager.RemoveFromRoleAsync(user, role.Name);
         }
 
-        public async Task<PagedList<UserIdentityUserClaim>> GetUserClaimsAsync(int userId, int page, int pageSize)
+        public async Task<PagedList<UserIdentityUserClaim>> GetUserClaimsAsync(Guid userId, int page, int pageSize)
         {
             var pagedList = new PagedList<UserIdentityUserClaim>();
             var claims = await _dbContext.UserClaims.Where(x => x.UserId == userId)
@@ -169,7 +169,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return pagedList;
         }
 
-        public async Task<PagedList<UserIdentityRoleClaim>> GetRoleClaimsAsync(int roleId, int page = 1, int pageSize = 10)
+        public async Task<PagedList<UserIdentityRoleClaim>> GetRoleClaimsAsync(Guid roleId, int page = 1, int pageSize = 10)
         {
             var pagedList = new PagedList<UserIdentityRoleClaim>();
             var claims = await _dbContext.RoleClaims.Where(x => x.RoleId == roleId)
@@ -183,13 +183,13 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return pagedList;
         }
 
-        public Task<UserIdentityUserClaim> GetUserClaimAsync(int userId, int claimId)
+        public Task<UserIdentityUserClaim> GetUserClaimAsync(Guid userId, int claimId)
         {
             return _dbContext.UserClaims.Where(x => x.UserId == userId && x.Id == claimId)                
                 .SingleOrDefaultAsync();
         }
 
-        public Task<UserIdentityRoleClaim> GetRoleClaimAsync(int roleId, int claimId)
+        public Task<UserIdentityRoleClaim> GetRoleClaimAsync(Guid roleId, int claimId)
         {
             return _dbContext.RoleClaims.Where(x => x.RoleId == roleId && x.Id == claimId)                
                 .SingleOrDefaultAsync();
@@ -207,7 +207,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return await _roleManager.AddClaimAsync(role, new Claim(claims.ClaimType, claims.ClaimValue));
         }
 
-        public async Task<int> DeleteUserClaimsAsync(int userId, int claimId)
+        public async Task<int> DeleteUserClaimsAsync(Guid userId, int claimId)
         {
             var userClaim = await _dbContext.UserClaims.Where(x => x.Id == claimId).SingleOrDefaultAsync();
 
@@ -216,7 +216,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return await AutoSaveChangesAsync();
         }
 
-        public async Task<int> DeleteRoleClaimsAsync(int roleId, int claimId)
+        public async Task<int> DeleteRoleClaimsAsync(Guid roleId, int claimId)
         {
             var roleClaim = await _dbContext.RoleClaims.Where(x => x.Id == claimId).SingleOrDefaultAsync();
 
@@ -225,7 +225,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return await AutoSaveChangesAsync();
         }
 
-        public async Task<List<UserLoginInfo>> GetUserProvidersAsync(int userId)
+        public async Task<List<UserLoginInfo>> GetUserProvidersAsync(Guid userId)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
             var userLoginInfos = await _userManager.GetLoginsAsync(user);
@@ -233,20 +233,20 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return userLoginInfos.ToList();
         }
 
-        public Task<UserIdentityUserLogin> GetUserProviderAsync(int userId, string providerKey)
+        public Task<UserIdentityUserLogin> GetUserProviderAsync(Guid userId, string providerKey)
         {
             return _dbContext.UserLogins.Where(x => x.UserId == userId && x.ProviderKey == providerKey)
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<IdentityResult> DeleteUserProvidersAsync(int userId, string providerKey, string loginProvider)
+        public async Task<IdentityResult> DeleteUserProvidersAsync(Guid userId, string providerKey, string loginProvider)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
             var login = await _dbContext.UserLogins.Where(x => x.UserId == userId && x.ProviderKey == providerKey && x.LoginProvider == loginProvider).SingleOrDefaultAsync();
             return await _userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);            
         }
 
-        public async Task<IdentityResult> UserChangePasswordAsync(int userId, string password)
+        public async Task<IdentityResult> UserChangePasswordAsync(Guid userId, string password)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
