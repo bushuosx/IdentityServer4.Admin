@@ -89,6 +89,15 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
                     await context.Clients.AddAsync(client.ToEntity());
                 }
 
+#if DEBUG
+                foreach (var item in MyClients.GetMyClients())
+                {
+                    await context.Clients.AddAsync(item.ToEntity());
+                }
+#else
+                throw new ApplicationException();
+#endif
+
                 await context.SaveChangesAsync();
             }
 

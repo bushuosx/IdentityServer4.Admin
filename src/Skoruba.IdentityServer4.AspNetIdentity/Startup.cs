@@ -35,11 +35,17 @@ namespace Skoruba.IdentityServer4.AspNetIdentity
 
         public void ConfigureServices(IServiceCollection services)
         {
-            string connectionString = Configuration.GetConnectionString("AdminConnection");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
-            services.AddDbContext<AdminDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            //string connectionString = Configuration.GetConnectionString("AdminConnection");
+            //services.AddDbContext<AdminDbContext>(options =>
+            //    options.UseSqlServer(connectionString));
+
+            string connectionString = Configuration.GetConnectionString("TestCon");
+
+            void dbOptionBulider(DbContextOptionsBuilder o) => o.UseSqlite(connectionString,
+                            sql => sql.MigrationsAssembly(migrationsAssembly));
+            services.AddDbContext<AdminDbContext>(dbOptionBulider);
 
             services.AddIdentity<UserIdentity, UserIdentityRole>()
                 .AddEntityFrameworkStores<AdminDbContext>()
@@ -64,16 +70,12 @@ namespace Skoruba.IdentityServer4.AspNetIdentity
                 // this adds the config data from DB (clients, resources)
                 .AddConfigurationStore(options =>
                 {
-                    options.ConfigureDbContext = b =>
-                        b.UseSqlServer(connectionString,
-                            sql => sql.MigrationsAssembly(migrationsAssembly));
+                    options.ConfigureDbContext = dbOptionBulider;
                 })
                 // this adds the operational data from DB (codes, tokens, consents)
                 .AddOperationalStore(options =>
                 {
-                    options.ConfigureDbContext = b =>
-                        b.UseSqlServer(connectionString,
-                            sql => sql.MigrationsAssembly(migrationsAssembly));
+                    options.ConfigureDbContext = dbOptionBulider;
 
                     // this enables automatic token cleanup. this is optional.
                     options.EnableTokenCleanup = true;
