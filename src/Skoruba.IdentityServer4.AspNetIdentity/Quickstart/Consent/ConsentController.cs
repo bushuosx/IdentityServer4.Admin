@@ -8,6 +8,7 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -81,7 +82,19 @@ namespace IdentityServer4.Quickstart.UI
             return View("Error");
         }
 
-
+        //[Obsolete]
+        //private async Task<string> GetRequestRedirectUrl(string returnUrl)
+        //{
+        //    var request = await _interaction.GetAuthorizationContextAsync(returnUrl);
+        //    if (request == null)
+        //    {
+        //        return null;
+        //    }
+        //    else
+        //    {
+        //        return request.RedirectUri;
+        //    }
+        //}
 
         /*****************************************/
         /* helper APIs for the ConsentController */
@@ -96,6 +109,7 @@ namespace IdentityServer4.Quickstart.UI
             if (model.Button == "no")
             {
                 grantedConsent = ConsentResponse.Denied;
+                //result.RedirectUri = await GetRequestRedirectUrl(model.ReturnUrl);
             }
             // user clicked 'yes' - validate the data
             else if (model.Button == "yes" && model != null)

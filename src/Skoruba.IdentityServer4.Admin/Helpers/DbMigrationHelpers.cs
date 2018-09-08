@@ -29,6 +29,7 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
 
                 await EnsureSeedData(services);
             }
+            //await EnsureSeedData(host.Services);
         }
 
         public static async Task EnsureSeedData(IServiceProvider serviceProvider)
