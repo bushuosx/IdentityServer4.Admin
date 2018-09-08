@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "ConfirmForbid";
+    ConsentInputModel model = TempData["ConsentInputModel"] as ConsentInputModel;
+}
+
+@if (model == null)
+{
+    <p class="text-danger">ConsentInputModel不能为空</p>
+    <p>请联系网站管理员解决</p>
+}
+else
+{
+    <h2>确认拒绝</h2>
+
+    <div>
+        <p>你已经拒绝了<span></span></p>
+    </div>
+}
+

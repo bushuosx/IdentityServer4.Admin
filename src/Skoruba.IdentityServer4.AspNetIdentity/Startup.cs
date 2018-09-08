@@ -37,14 +37,14 @@ namespace Skoruba.IdentityServer4.AspNetIdentity
         {
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
-            //string connectionString = Configuration.GetConnectionString("AdminConnection");
-            //services.AddDbContext<AdminDbContext>(options =>
-            //    options.UseSqlServer(connectionString));
-
-            string connectionString = Configuration.GetConnectionString("TestCon");
-
-            void dbOptionBulider(DbContextOptionsBuilder o) => o.UseSqlite(connectionString,
+            string connectionString = Configuration.GetConnectionString("AdminConnection");
+            void dbOptionBulider(DbContextOptionsBuilder o) => o.UseSqlServer(connectionString,
                             sql => sql.MigrationsAssembly(migrationsAssembly));
+
+            //string connectionString = Configuration.GetConnectionString("TestCon");
+            //void dbOptionBulider(DbContextOptionsBuilder o) => o.UseSqlite(connectionString,
+            //                sql => sql.MigrationsAssembly(migrationsAssembly));
+
             services.AddDbContext<AdminDbContext>(dbOptionBulider);
 
             services.AddIdentity<UserIdentity, UserIdentityRole>()

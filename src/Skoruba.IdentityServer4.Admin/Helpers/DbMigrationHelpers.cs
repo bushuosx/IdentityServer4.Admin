@@ -86,13 +86,13 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
             {
                 foreach (var client in Clients.GetAdminClient().ToList())
                 {
-                    await context.Clients.AddAsync(client.ToEntity());
+                    var r = await context.Clients.AddAsync(client.ToEntity());
                 }
 
 #if DEBUG
                 foreach (var item in MyClients.GetMyClients())
                 {
-                    await context.Clients.AddAsync(item.ToEntity());
+                    var r = await context.Clients.AddAsync(item.ToEntity());
                 }
 #else
                 throw new ApplicationException();

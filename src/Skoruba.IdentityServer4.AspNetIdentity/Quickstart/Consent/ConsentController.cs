@@ -81,6 +81,8 @@ namespace IdentityServer4.Quickstart.UI
             return View("Error");
         }
 
+
+
         /*****************************************/
         /* helper APIs for the ConsentController */
         /*****************************************/
