@@ -19,6 +19,8 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Entities.Identity;
+using Skoruba.IdentityServer4.Admin.EntityFramework.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace IdentityServer4.Quickstart.UI
 {
@@ -31,12 +33,13 @@ namespace IdentityServer4.Quickstart.UI
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
-
+        private readonly AdminDbContext _adminDbContext;
         public AccountController(
             UserManager<UserIdentity> userManager,
             SignInManager<UserIdentity> signInManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
+            AdminDbContext adminDbContext,
             IAuthenticationSchemeProvider schemeProvider,
             IEventService events)
         {
@@ -46,6 +49,7 @@ namespace IdentityServer4.Quickstart.UI
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
             _events = events;
+            _adminDbContext = adminDbContext ?? throw new NotImplementedException(nameof(adminDbContext));
         }
 
         /// <summary>
@@ -254,6 +258,72 @@ namespace IdentityServer4.Quickstart.UI
             }
 
             return View("LoggedOut", vm);
+        }
+
+        //启用注册，工号与身份证核对
+        public IActionResult Register() { return View(); }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(Skoruba.IdentityServer4.AspNetIdentity.Quickstart.Account.RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.UserName = model.UserName.ToLower();
+
+                var userExisted = await _userManager.FindByNameAsync(model.UserName);
+                if (userExisted != null)
+                {
+                    ModelState.AddModelError(nameof(model.UserName), "此工号已被注册");
+                    return View(model);
+                }
+
+                var employ = await _adminDbContext.Employees.FirstOrDefaultAsync(x => x.GH_工号 == model.UserName);
+                if (employ==null)
+                {
+                    ModelState.AddModelError(nameof(model.UserName), "此工号未登记，请确认后联系管理员");
+                    return View(model);
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(employ.SFZH_身份证号))
+                    {
+                        ModelState.AddModelError(nameof(model.OldPassword), "此工号未登记身份证信息，请联系管理员");
+                        return View(model);
+                    }
+                    else
+                    {
+                        var len = employ.SFZH_身份证号.Length;
+                        if (len < 4) //其实应该是<15就是错误的身份证号
+                        {
+                            ModelState.AddModelError(nameof(model.OldPassword), "此工号登记的身份证信息有误，请联系管理员");
+                            return View(model);
+                        }
+                        else if(employ.SFZH_身份证号.Substring(len-4).ToLower() != model.OldPassword.ToLower())
+                        {
+                            ModelState.AddModelError(nameof(model.OldPassword), "初始密码错误");
+                            return View(model);
+                        }
+                        else
+                        {
+                            //正式注册
+                            var user = new UserIdentity { UserName = model.UserName,Email=model.Email };
+                            var ir = await _userManager.CreateAsync(user, model.Password);
+                            if (ir.Succeeded)
+                            {
+                                return RedirectToAction(nameof(Login));
+                            }
+                            else
+                            {
+                                return StatusCode(500, string.Join(',', ir.Errors.Select(x => $"{x.Code}:{x.Description}").DefaultIfEmpty()));
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return View(model);
+            }
         }
 
         /*****************************************/

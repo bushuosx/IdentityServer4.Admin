@@ -1,0 +1,45 @@
+﻿@model Skoruba.IdentityServer4.AspNetIdentity.Quickstart.Account.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>注册</h2>
+
+<h4>初始密码为身份证后4位</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Register">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OldPassword" class="control-label"></label>
+                <input asp-for="OldPassword" class="form-control" />
+                <span asp-validation-for="OldPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="注册" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>

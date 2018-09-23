@@ -65,6 +65,8 @@ namespace Skoruba.IdentityServer4.Admin.EntityFramework.DbContexts
 
         public DbSet<Log> Logs { get; set; }
 
+        public DbSet<Employee> Employees { get; set; }
+
         public Task<int> SaveChangesAsync()
         {
             return base.SaveChangesAsync();
