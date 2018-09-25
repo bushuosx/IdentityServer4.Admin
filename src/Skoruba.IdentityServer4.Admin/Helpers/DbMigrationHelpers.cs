@@ -43,6 +43,7 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
                 context.Database.Migrate();
                 await EnsureSeedIdentityServerData(context);
                 await EnsureSeedIdentityData(userManager, roleManager);
+                await EnsureSeedEmployeeData(context);
             }
         }
 
@@ -124,5 +125,18 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
                 await context.SaveChangesAsync();
             }
         }
+
+
+        private static async Task EnsureSeedEmployeeData(AdminDbContext context)
+        {
+            if (!context.Employees.Any())
+            {
+                context.Employees.AddRange(
+                    new EntityFramework.Entities.Employee {  GH_工号="e11057", SFZH_身份证号="420923198408153413", XM_姓名="江俊"}
+                    );
+                await context.SaveChangesAsync();
+            }
+        }
+
     }
 }

@@ -47,7 +47,13 @@ namespace Skoruba.IdentityServer4.AspNetIdentity
 
             services.AddDbContext<AdminDbContext>(dbOptionBulider);
 
-            services.AddIdentity<UserIdentity, UserIdentityRole>()
+            services.AddIdentity<UserIdentity, UserIdentityRole>(ido=> {
+                ido.Password.RequireDigit = false;
+                ido.Password.RequiredLength = 1;
+                ido.Password.RequireLowercase = false;
+                ido.Password.RequireNonAlphanumeric = false;
+                ido.Password.RequireUppercase = false;
+            })
                 .AddEntityFrameworkStores<AdminDbContext>()
                 .AddDefaultTokenProviders();
 
