@@ -19,6 +19,14 @@
   width: 0;
   height: 0;
 }
+.welcome-page div.apppushdiv {
+  border-style: solid;
+  border-color: peachpuff;
+  border-width: 2px;
+}
+.welcome-page div.apppushdiv:hover {
+  background-color: papayawhip;
+}
 .page-consent .client-logo {
   float: left;
 }

@@ -87,7 +87,7 @@ namespace IdentityServer4.Quickstart.UI
                     // denied the consent (even if this client does not require consent).
                     // this will send back an access denied OIDC error response to the client.
                     await _interaction.GrantConsentAsync(context, ConsentResponse.Denied);
-                    
+
                     // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
                     return Redirect(model.ReturnUrl);
                 }
@@ -261,7 +261,11 @@ namespace IdentityServer4.Quickstart.UI
         }
 
         //启用注册，工号与身份证核对
-        public IActionResult Register() { return View(); }
+        public IActionResult Register()
+        {
+            return View();
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(Skoruba.IdentityServer4.AspNetIdentity.Quickstart.Account.RegisterViewModel model)
@@ -278,7 +282,7 @@ namespace IdentityServer4.Quickstart.UI
                 }
 
                 var employ = await _adminDbContext.Employees.FirstOrDefaultAsync(x => x.GH_工号 == model.UserName);
-                if (employ==null)
+                if (employ == null)
                 {
                     ModelState.AddModelError(nameof(model.UserName), "此工号未登记，请确认后联系管理员");
                     return View(model);
@@ -298,7 +302,7 @@ namespace IdentityServer4.Quickstart.UI
                             ModelState.AddModelError(nameof(model.OldPassword), "此工号登记的身份证信息有误，请联系管理员");
                             return View(model);
                         }
-                        else if(employ.SFZH_身份证号.Substring(len-4).ToLower() != model.OldPassword.ToLower())
+                        else if (employ.SFZH_身份证号.Substring(len - 4).ToLower() != model.OldPassword.ToLower())
                         {
                             ModelState.AddModelError(nameof(model.OldPassword), "初始密码错误");
                             return View(model);
@@ -306,7 +310,7 @@ namespace IdentityServer4.Quickstart.UI
                         else
                         {
                             //正式注册
-                            var user = new UserIdentity { UserName = model.UserName,Email=model.Email };
+                            var user = new UserIdentity { UserName = model.UserName, Email = model.Email };
                             var ir = await _userManager.CreateAsync(user, model.Password);
                             if (ir.Succeeded)
                             {
@@ -498,7 +502,7 @@ namespace IdentityServer4.Quickstart.UI
             }
         }
 
-        private async Task<(UserIdentity user, string provider, string providerUserId, IEnumerable<Claim> claims)> 
+        private async Task<(UserIdentity user, string provider, string providerUserId, IEnumerable<Claim> claims)>
             FindUserFromExternalProviderAsync(AuthenticateResult result)
         {
             var externalUser = result.Principal;
