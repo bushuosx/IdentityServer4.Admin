@@ -372,5 +372,10 @@ namespace Skoruba.IdentityServer4.Admin.Controllers
 
             return View(user);
         }
+
+        public IActionResult ImportUser()
+        {
+            return View();
+        }
     }
 }

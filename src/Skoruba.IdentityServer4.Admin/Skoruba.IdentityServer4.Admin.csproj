@@ -8,7 +8,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="7.0.1" />
+		<PackageReference Include="DotNetCore.NPOI" Version="1.2.1" />
 		<PackageReference Include="IdentityServer4.EntityFramework" Version="2.1.1" />
+		<PackageReference Include="LINQKit.Core" Version="1.1.15" />
 		<PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.3" />
