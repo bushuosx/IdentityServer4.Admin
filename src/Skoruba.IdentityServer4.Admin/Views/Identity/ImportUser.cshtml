@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewData["Title"] = "导入用户";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<hr />
+<div>导入员工数据。员工依据此数据方能进行注册</div>
+<div><a href="~/employees.xlsx">点击这里下载模板</a></div>
+<form asp-action="ImportUser" method="post" enctype="multipart/form-data">
+    <div>要导入的Excel文件</div>
+    <div><input type="file" name="formFile" /></div>
+    <input type="submit" value="提交" />
+</form>

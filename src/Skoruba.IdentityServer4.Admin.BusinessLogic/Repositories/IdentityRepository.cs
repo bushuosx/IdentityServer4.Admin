@@ -266,22 +266,20 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return AutoSaveChanges ? await _dbContext.SaveChangesAsync() : (int)SavedStatus.WillBeSavedExplicitly;
         }
 
-        public async Task<int> ImportUserAsnyc(IEnumerable<string> userNames)
+        public async Task<int> ImportUserAsnyc(List<EntityFramework.Entities.Employee> employees)
         {
             //
-            if (userNames == null || userNames.Count() == 0)
+            if (employees == null || employees.Count() == 0)
             {
                 return 0;
             }
 
-            var lowerNames = userNames.Where(x => !string.IsNullOrWhiteSpace(x) && x.All(y => char.IsLetterOrDigit(y))).Select(x => x.ToLower()).ToList();
-            if (lowerNames.Count != userNames.Count())
+            var existed = await _dbContext.Employees.AnyAsync(x => employees.Any(y => y.GH_工号 == x.GH_工号));
+            if (existed)
             {
                 return 0;
             }
-
-            var existed = await _dbContext.Users.AnyAsync(x => lowerNames.Contains(x.UserName));
-            await _dbContext.Users.AddRangeAsync(userNames.Select(x => new UserIdentity { UserName = x }));
+            await _dbContext.Employees.AddRangeAsync(employees);
 
             return await _dbContext.SaveChangesAsync();
         }

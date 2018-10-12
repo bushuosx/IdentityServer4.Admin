@@ -10,6 +10,11 @@ using Skoruba.IdentityServer4.Admin.BusinessLogic.Services;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Identity;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Common;
 using System;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using NPOI.SS.UserModel;
+using System.Collections.Generic;
+using Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos;
 
 namespace Skoruba.IdentityServer4.Admin.Controllers
 {
@@ -376,6 +381,36 @@ namespace Skoruba.IdentityServer4.Admin.Controllers
         public IActionResult ImportUser()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ImportUser(IFormFile formFile)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                await formFile.CopyToAsync(memoryStream);
+                IWorkbook workbook = WorkbookFactory.Create(memoryStream);
+                ISheet sheet = workbook.GetSheetAt(0);
+                IRow row = sheet.GetRow(0);
+                if (row.GetCell(0).ToString() != "工号" || row.GetCell(1).ToString() != "姓名" || row.GetCell(2).ToString() != "身份证号")
+                {
+                    return Content("模板与预期不一致");
+                }
+                List<EntityFramework.Entities.Employee> employeeList = new List<EntityFramework.Entities.Employee>();
+                for (int i = 1; i <= sheet.LastRowNum; i++)
+                {
+                    var tmpRow = sheet.GetRow(i);
+                    employeeList.Add(new EntityFramework.Entities.Employee {  GH_工号= tmpRow.GetCell(0).ToString(),  XM_姓名= tmpRow.GetCell(1).ToString(),  SFZH_身份证号= tmpRow.GetCell(2).ToString() });
+                }
+
+                if (employeeList.Count == 0)
+                {
+                    return Content("无数据");
+                }
+
+                var rst = await _identityService.ImportUserAsnyc(employeeList);
+                return Content(rst == employeeList.Count ? "导入成功" : "导入失败");
+            }
         }
     }
 }
