@@ -97,7 +97,8 @@ namespace Skoruba.IdentityServer4.AspNetIdentity
             }
             else
             {
-                throw new Exception("need to configure key material");
+                builder.AddDeveloperSigningCredential();
+                //throw new Exception("need to configure key material");
             }
         }
 

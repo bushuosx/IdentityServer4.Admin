@@ -3,8 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:9000/",
-      "sslPort": 0
+      "applicationUrl": "http://localhost:9000/"
     }
   },
   "profiles": {
@@ -20,6 +19,14 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:9000/"
+    },
+    "YYServer": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "YYServer"
       },
       "applicationUrl": "http://localhost:9000/"
     }

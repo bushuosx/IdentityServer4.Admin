@@ -96,8 +96,6 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
                 {
                     var r = await context.Clients.AddAsync(item.ToEntity());
                 }
-#else
-                throw new ApplicationException();
 #endif
 
                 await context.SaveChangesAsync();
@@ -129,14 +127,15 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
 
         private static async Task EnsureSeedEmployeeData(AdminDbContext context)
         {
+#if DEBUG
             if (!context.Employees.Any())
             {
                 context.Employees.AddRange(
-                    new EntityFramework.Entities.Employee {  GH_工号="e11057", SFZH_身份证号="420923198408153413", XM_姓名="江俊"}
+                    new EntityFramework.Entities.Employee { GH_工号 = "e11057", SFZH_身份证号 = "420923198408153413", XM_姓名 = "江俊" }
                     );
                 await context.SaveChangesAsync();
             }
+#endif
         }
-
     }
 }
