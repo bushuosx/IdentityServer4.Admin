@@ -47,7 +47,8 @@ namespace Skoruba.IdentityServer4.AspNetIdentity
 
             services.AddDbContext<AdminDbContext>(dbOptionBulider);
 
-            services.AddIdentity<UserIdentity, UserIdentityRole>(ido=> {
+            services.AddIdentity<UserIdentity, UserIdentityRole>(ido =>
+            {
                 ido.Password.RequireDigit = false;
                 ido.Password.RequiredLength = 1;
                 ido.Password.RequireLowercase = false;
@@ -97,7 +98,7 @@ namespace Skoruba.IdentityServer4.AspNetIdentity
             }
             else
             {
-                builder.AddDeveloperSigningCredential();
+                builder.AddDeveloperSigningCredential(true, "tempkey.rsa");
                 //throw new Exception("need to configure key material");
             }
         }
