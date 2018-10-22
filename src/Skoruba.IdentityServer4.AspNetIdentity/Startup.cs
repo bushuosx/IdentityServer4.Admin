@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Skoruba.IdentityServer4.Admin.EntityFramework.DbContexts;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Entities.Identity;
 
@@ -101,6 +103,12 @@ namespace Skoruba.IdentityServer4.AspNetIdentity
                 builder.AddDeveloperSigningCredential(true, "tempkey.rsa");
                 //throw new Exception("need to configure key material");
             }
+
+            //var cors = new DefaultCorsPolicyService(loggerFactory.CreateLogger<DefaultCorsPolicyService>())
+            //{
+            //    AllowedOrigins = { "https://foo", "https://bar" }
+            //};
+            //services.AddSingleton<ICorsPolicyService>(cors);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

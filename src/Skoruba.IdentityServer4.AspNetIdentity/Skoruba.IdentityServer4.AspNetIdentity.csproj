@@ -17,6 +17,6 @@
     <ProjectReference Include="..\Skoruba.IdentityServer4.Admin.EntityFramework\Skoruba.IdentityServer4.Admin.EntityFramework.csproj" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1YYServer_1json__JSONSchema="" appsettings_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>
