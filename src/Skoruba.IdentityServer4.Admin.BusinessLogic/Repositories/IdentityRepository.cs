@@ -266,22 +266,46 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
             return AutoSaveChanges ? await _dbContext.SaveChangesAsync() : (int)SavedStatus.WillBeSavedExplicitly;
         }
 
-        public async Task<int> ImportUserAsnyc(List<EntityFramework.Entities.Employee> employees)
+        public async Task<List<EntityFramework.Entities.Employee>> ImportUserAsnyc(List<EntityFramework.Entities.Employee> employees)
         {
             //
             if (employees == null || employees.Count() == 0)
             {
-                return 0;
+                return employees;
             }
 
-            var existed = await _dbContext.Employees.AnyAsync(x => employees.Any(y => y.GH_工号 == x.GH_工号));
-            if (existed)
-            {
-                return 0;
-            }
-            await _dbContext.Employees.AddRangeAsync(employees);
+            //var existed = await _dbContext.Employees.AnyAsync(x => employees.Any(y => y.GH_工号 == x.GH_工号));
+            //if (existed)
+            //{
+            //    return 0;
+            //}
+            //await _dbContext.Employees.AddRangeAsync(employees);
 
-            return await _dbContext.SaveChangesAsync();
+            //return await _dbContext.SaveChangesAsync();
+
+
+
+            var exisitedGHList = await _dbContext.Employees.Select(x => x.GH_工号).ToListAsync();
+
+            var willAddEmploryees = employees.Where(x => !exisitedGHList.Contains(x.GH_工号)).ToList();
+
+            await _dbContext.Employees.AddRangeAsync(willAddEmploryees);
+
+            return willAddEmploryees;
+
+            //try
+            //{
+            //    //var saved = await _dbContext.SaveChangesAsync();
+            //    //var resp = string.Join(";", exisitedGHList);
+
+            //    //return Content(string.Format("导入完成，成功{0}，失败{1}。{2}", saved, exisitedGHList.Count, resp));
+
+            //}
+            //catch (DbUpdateException e)
+            //{
+            //    _logger.LogError(e, "ImportUser");
+            //    return StatusCode(StatusCodes.Status505HttpVersionNotsupported);
+            //}
         }
     }
 }

@@ -6,6 +6,6 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
 {
 	public interface IIdentityRepository : IBaseIdentityRepository<Guid, Guid, int>
     {
-        Task<int> ImportUserAsnyc(List<EntityFramework.Entities.Employee> employees);
+        Task<List<EntityFramework.Entities.Employee>> ImportUserAsnyc(List<EntityFramework.Entities.Employee> employees);
     }
 }

@@ -295,7 +295,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Services
             return HandleIdentityError(identityResult, _identityServiceResources.RoleDeleteFailed().Description, _identityServiceResources.IdentityErrorKey().Description, role);
         }
 
-        public Task<int> ImportUserAsnyc(List<EntityFramework.Entities.Employee> userNames)
+        public Task<List<EntityFramework.Entities.Employee>> ImportUserAsnyc(List<EntityFramework.Entities.Employee> userNames)
         {
             if (userNames == null || userNames.Count() == 0)
             {

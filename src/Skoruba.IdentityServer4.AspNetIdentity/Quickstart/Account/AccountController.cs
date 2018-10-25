@@ -21,12 +21,21 @@ using System.Collections.Generic;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Entities.Identity;
 using Skoruba.IdentityServer4.Admin.EntityFramework.DbContexts;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
+using Skoruba.IdentityServer4.Admin.BusinessLogic.Services;
+using NPOI.SS.UserModel;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Entities;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IdentityServer4.Quickstart.UI
 {
     [SecurityHeaders]
     public class AccountController : Controller
     {
+        public const string AdministrationRole = "SkorubaIdentityAdminAdministrator";
+
+
         private readonly UserManager<UserIdentity> _userManager;
         private readonly SignInManager<UserIdentity> _signInManager;
         private readonly IIdentityServerInteractionService _interaction;
@@ -34,6 +43,8 @@ namespace IdentityServer4.Quickstart.UI
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
         private readonly AdminDbContext _adminDbContext;
+        private readonly ILogger _logger;
+
         public AccountController(
             UserManager<UserIdentity> userManager,
             SignInManager<UserIdentity> signInManager,
@@ -41,7 +52,8 @@ namespace IdentityServer4.Quickstart.UI
             IClientStore clientStore,
             AdminDbContext adminDbContext,
             IAuthenticationSchemeProvider schemeProvider,
-            IEventService events)
+            IEventService events,
+            ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -50,7 +62,64 @@ namespace IdentityServer4.Quickstart.UI
             _schemeProvider = schemeProvider;
             _events = events;
             _adminDbContext = adminDbContext ?? throw new NotImplementedException(nameof(adminDbContext));
+            _logger = logger;
         }
+
+        [Authorize(Roles = AdministrationRole)]
+        public IActionResult ImportUser()
+        {
+            return StatusCode(StatusCodes.Status423Locked);
+            //return View();
+        }
+
+        //[Authorize(Roles = AdministrationRole)]
+        //[HttpPost]
+        //public async Task<IActionResult> ImportUser(IFormFile formFile)
+        //{
+        //    using (MemoryStream memoryStream = new MemoryStream())
+        //    {
+        //        await formFile.CopyToAsync(memoryStream);
+        //        IWorkbook workbook = WorkbookFactory.Create(memoryStream);
+        //        ISheet sheet = workbook.GetSheetAt(0);
+        //        IRow row = sheet.GetRow(0);
+        //        if (row.GetCell(0).ToString() != "工号" || row.GetCell(1).ToString() != "姓名" || row.GetCell(2).ToString() != "身份证号")
+        //        {
+        //            return Content("模板与预期不一致");
+        //        }
+        //        List<Employee> employeeList = new List<Employee>();
+        //        for (int i = 1; i <= sheet.LastRowNum; i++)
+        //        {
+        //            var tmpRow = sheet.GetRow(i);
+        //            employeeList.Add(new Employee { GH_工号 = tmpRow.GetCell(0).ToString(), XM_姓名 = tmpRow.GetCell(1).ToString(), SFZH_身份证号 = tmpRow.GetCell(2).ToString() });
+        //        }
+
+        //        if (employeeList.Count == 0)
+        //        {
+        //            return Content("无数据");
+        //        }
+
+        //        var exisitedGHList = await _adminDbContext.Employees.Select(x => x.GH_工号).ToListAsync();
+
+        //        var willAddEmploryees = employeeList.Where(x => !exisitedGHList.Contains(x.GH_工号));
+
+        //        await _adminDbContext.Employees.AddRangeAsync(willAddEmploryees);
+
+        //        try
+        //        {
+        //            var saved = await _adminDbContext.SaveChangesAsync();
+        //            var resp = string.Join(';', exisitedGHList);
+
+        //            return Content(string.Format("导入完成，成功{0}，失败{1}。{2}", saved, exisitedGHList.Count, resp));
+
+        //        }
+        //        catch (DbUpdateException e)
+        //        {
+        //            _logger.LogError(e, "ImportUser");
+        //            return StatusCode(StatusCodes.Status505HttpVersionNotsupported);
+        //        }
+
+        //    }
+        //}
 
         /// <summary>
         /// Show login page
@@ -100,7 +169,7 @@ namespace IdentityServer4.Quickstart.UI
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, AccountOptions.AllowRememberLogin && model.RememberLogin, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(model.Username);

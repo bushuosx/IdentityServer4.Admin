@@ -380,6 +380,7 @@ namespace Skoruba.IdentityServer4.Admin.Controllers
 
         public IActionResult ImportUser()
         {
+            // return StatusCode(StatusCodes.Status423Locked);
             return View();
         }
 
@@ -396,20 +397,54 @@ namespace Skoruba.IdentityServer4.Admin.Controllers
                 {
                     return Content("模板与预期不一致");
                 }
-                List<EntityFramework.Entities.Employee> employeeList = new List<EntityFramework.Entities.Employee>();
+
+                Dictionary<string, EntityFramework.Entities.Employee> employeeDict = new Dictionary<string, EntityFramework.Entities.Employee>();
                 for (int i = 1; i <= sheet.LastRowNum; i++)
                 {
                     var tmpRow = sheet.GetRow(i);
-                    employeeList.Add(new EntityFramework.Entities.Employee {  GH_工号= tmpRow.GetCell(0).ToString(),  XM_姓名= tmpRow.GetCell(1).ToString(),  SFZH_身份证号= tmpRow.GetCell(2).ToString() });
+                    var gh = tmpRow.GetCell(0)?.ToString();
+                    var xm = tmpRow.GetCell(1)?.ToString();
+                    var sfz = tmpRow.GetCell(2)?.ToString();
+
+                    if (string.IsNullOrWhiteSpace(gh)
+                         || string.IsNullOrWhiteSpace(xm)
+                         || string.IsNullOrWhiteSpace(sfz))
+                    {
+                        return Content("数据内容有误:工号、姓名、身份证均不能为空");
+                    }
+
+                    if (!employeeDict.ContainsKey(gh))
+                    {
+                        employeeDict.Add(gh, new EntityFramework.Entities.Employee { GH_工号 = gh, XM_姓名 = xm, SFZH_身份证号 = sfz });
+                    }
                 }
 
-                if (employeeList.Count == 0)
+                if (employeeDict.Count == 0)
                 {
-                    return Content("无数据");
+                    return Content("数据内容为空");
                 }
+
+                var employeeList = employeeDict.Values.ToList();
 
                 var rst = await _identityService.ImportUserAsnyc(employeeList);
-                return Content(rst == employeeList.Count ? "导入成功" : "导入失败");
+                if (rst.Count == 0)
+                {
+                    return Content("导入失败");
+                }
+
+                var notAdd = employeeList.Where(x => !rst.Any(y => y.GH_工号 == x.GH_工号)).Select(x => x.GH_工号).ToList();
+
+                if (notAdd.Count == 0)
+                {
+                    return Content("导入全部成功");
+                }
+                else
+                {
+                    var msg = string.Join(";", notAdd);
+
+                    return Content(string.Format("导入部分成功，失败的工号如下：{0}", msg));
+                }
+
             }
         }
     }
