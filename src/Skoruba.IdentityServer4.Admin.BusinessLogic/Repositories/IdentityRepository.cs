@@ -291,7 +291,9 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Repositories
 
             await _dbContext.Employees.AddRangeAsync(willAddEmploryees);
 
+            var i = await _dbContext.SaveChangesAsync();
             return willAddEmploryees;
+
 
             //try
             //{
