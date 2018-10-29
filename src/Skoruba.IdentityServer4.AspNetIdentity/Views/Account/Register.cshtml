@@ -4,24 +4,30 @@
     ViewData["Title"] = "Register";
 }
 
-<h2>注册</h2>
-
-<h4>初始密码为身份证后4位</h4>
+<h2>注册并激活工号</h2>
+@if (AccountOptions.RegisterCheckSFZ)
+{
+    <h4>初始密码为身份证后4位</h4>
+}
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Register">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ReturnUrl" />
             <div class="form-group">
                 <label asp-for="UserName" class="control-label"></label>
                 <input asp-for="UserName" class="form-control" />
                 <span asp-validation-for="UserName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="OldPassword" class="control-label"></label>
-                <input asp-for="OldPassword" class="form-control" />
-                <span asp-validation-for="OldPassword" class="text-danger"></span>
-            </div>
+            @if (AccountOptions.RegisterCheckSFZ)
+            {
+                <div class="form-group">
+                    <label asp-for="OldPassword" class="control-label"></label>
+                    <input asp-for="OldPassword" class="form-control" />
+                    <span asp-validation-for="OldPassword" class="text-danger"></span>
+                </div>
+            }
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
                 <input asp-for="Email" class="form-control" />
@@ -38,7 +44,7 @@
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="注册" class="btn btn-default" />
+                <input type="submit" value="注册激活" class="btn btn-default" />
             </div>
         </form>
     </div>

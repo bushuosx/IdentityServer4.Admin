@@ -21,5 +21,10 @@ namespace IdentityServer4.Quickstart.UI
         public static bool IncludeWindowsGroups = false;
 
         public static string InvalidCredentialsErrorMessage = "无效的用户名或密码";
+
+        /// <summary>
+        /// 注册时确认身份证号
+        /// </summary>
+        public static bool RegisterCheckSFZ = false;
     }
 }

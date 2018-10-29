@@ -27,6 +27,7 @@ using NPOI.SS.UserModel;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
+using Skoruba.IdentityServer4.AspNetIdentity.Quickstart.Account;
 
 namespace IdentityServer4.Quickstart.UI
 {
@@ -169,25 +170,42 @@ namespace IdentityServer4.Quickstart.UI
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, AccountOptions.AllowRememberLogin && model.RememberLogin, lockoutOnFailure: true);
-                if (result.Succeeded)
+                var user = await _userManager.FindByNameAsync(model.Username);
+                if (user == null)
                 {
-                    var user = await _userManager.FindByNameAsync(model.Username);
-                    await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id.ToString(), user.UserName));
-
-                    // make sure the returnUrl is still valid, and if so redirect back to authorize endpoint or a local page
-                    // the IsLocalUrl check is only necessary if you want to support additional local pages, otherwise IsValidReturnUrl is more strict
-                    if (_interaction.IsValidReturnUrl(model.ReturnUrl) || Url.IsLocalUrl(model.ReturnUrl))
+                    var employee = await _adminDbContext.Employees.FirstOrDefaultAsync(x => x.GH_工号 == model.Username.ToLower());
+                    if (employee == null)
                     {
-                        return Redirect(model.ReturnUrl);
+                        await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "不存在的工号"));
+
+                        ModelState.AddModelError("", "你输入的工号未录入，请联系管理员");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "你输入的工号还没激活，点击下方链接注册激活");
+                    }
+                }
+                else
+                {
+                    var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, AccountOptions.AllowRememberLogin && model.RememberLogin, lockoutOnFailure: true);
+                    if (result.Succeeded)
+                    {
+                        await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id.ToString(), user.UserName));
+
+                        // make sure the returnUrl is still valid, and if so redirect back to authorize endpoint or a local page
+                        // the IsLocalUrl check is only necessary if you want to support additional local pages, otherwise IsValidReturnUrl is more strict
+                        if (_interaction.IsValidReturnUrl(model.ReturnUrl) || Url.IsLocalUrl(model.ReturnUrl))
+                        {
+                            return Redirect(model.ReturnUrl);
+                        }
+
+                        return Redirect("~/");
                     }
 
-                    return Redirect("~/");
+                    await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials"));
+
+                    ModelState.AddModelError("", AccountOptions.InvalidCredentialsErrorMessage);
                 }
-
-                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials"));
-
-                ModelState.AddModelError("", AccountOptions.InvalidCredentialsErrorMessage);
             }
 
             // something went wrong, show form with error
@@ -330,9 +348,9 @@ namespace IdentityServer4.Quickstart.UI
         }
 
         //启用注册，工号与身份证核对
-        public IActionResult Register()
+        public IActionResult Register(string returnUrl)
         {
-            return View();
+            return View(new RegisterViewModel { ReturnUrl = returnUrl });
         }
 
         [HttpPost]
@@ -358,39 +376,41 @@ namespace IdentityServer4.Quickstart.UI
                 }
                 else
                 {
-                    if (string.IsNullOrWhiteSpace(employ.SFZH_身份证号))
+                    if (AccountOptions.RegisterCheckSFZ)
                     {
-                        ModelState.AddModelError(nameof(model.OldPassword), "此工号未登记身份证信息，请联系管理员");
-                        return View(model);
-                    }
-                    else
-                    {
-                        var len = employ.SFZH_身份证号.Length;
-                        if (len < 4) //其实应该是<15就是错误的身份证号
+                        if (string.IsNullOrWhiteSpace(employ.SFZH_身份证号))
                         {
-                            ModelState.AddModelError(nameof(model.OldPassword), "此工号登记的身份证信息有误，请联系管理员");
-                            return View(model);
-                        }
-                        else if (employ.SFZH_身份证号.Substring(len - 4).ToLower() != model.OldPassword.ToLower())
-                        {
-                            ModelState.AddModelError(nameof(model.OldPassword), "初始密码错误");
+                            ModelState.AddModelError(nameof(model.UserName), "此工号未登记身份证信息，请联系管理员");
                             return View(model);
                         }
                         else
                         {
-                            //正式注册
-                            var user = new UserIdentity { UserName = model.UserName, Email = model.Email };
-                            var ir = await _userManager.CreateAsync(user, model.Password);
-                            if (ir.Succeeded)
+                            var len = employ.SFZH_身份证号.Length;
+                            if (len < 4) //其实应该是<15就是错误的身份证号
                             {
-                                return RedirectToAction(nameof(Login));
+                                ModelState.AddModelError(nameof(model.UserName), "此工号登记的身份证信息有误，请联系管理员");
+                                return View(model);
                             }
-                            else
+                            else if (employ.SFZH_身份证号.Substring(len - 4).ToLower() != model.OldPassword.ToLower())
                             {
-                                return StatusCode(500, string.Join(',', ir.Errors.Select(x => $"{x.Code}:{x.Description}").DefaultIfEmpty()));
+                                ModelState.AddModelError(nameof(model.OldPassword), "初始密码错误");
+                                return View(model);
                             }
                         }
                     }
+
+                    //正式注册
+                    var user = new UserIdentity { UserName = model.UserName, Email = model.Email };
+                    var ir = await _userManager.CreateAsync(user, model.Password);
+                    if (ir.Succeeded)
+                    {
+                        return RedirectToAction(nameof(Login),new { returnUrl=model.ReturnUrl});
+                    }
+                    else
+                    {
+                        return StatusCode(500, string.Join(',', ir.Errors.Select(x => $"{x.Code}:{x.Description}").DefaultIfEmpty()));
+                    }
+
                 }
             }
             else

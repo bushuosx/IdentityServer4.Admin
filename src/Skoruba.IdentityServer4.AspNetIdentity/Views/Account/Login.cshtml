@@ -1,5 +1,9 @@
 ﻿@model LoginViewModel
 
+@{ 
+    var routeData = new Dictionary<string, string> { { "returnUrl", Model.ReturnUrl } };
+}
+
 <div class="login-page">
     <div class="page-header">
         <h1>登录</h1>
@@ -48,7 +52,7 @@
                             </fieldset>
                         </form>
 
-                        <a asp-controller="Account" asp-action="Register">点击这里注册</a>
+                        <a asp-controller="Account" asp-action="Register" asp-all-route-data="routeData">点击这里注册</a>
                     </div>
                 </div>
             </div>

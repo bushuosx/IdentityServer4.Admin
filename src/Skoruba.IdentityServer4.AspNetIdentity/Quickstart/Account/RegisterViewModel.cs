@@ -18,7 +18,6 @@ namespace Skoruba.IdentityServer4.AspNetIdentity.Quickstart.Account
         [DisplayName("身份证后4位")]
         public string OldPassword { get; set; }
 
-        [Required]
         [EmailAddress]
         [DisplayName("Email")]
         public string Email { get; set; }
@@ -32,5 +31,7 @@ namespace Skoruba.IdentityServer4.AspNetIdentity.Quickstart.Account
         [DataType(DataType.Password)]
         [DisplayName("确认密码")]
         public string ConfirmPassword { get; set; }
+
+        public string ReturnUrl { get; set; }
     }
 }
