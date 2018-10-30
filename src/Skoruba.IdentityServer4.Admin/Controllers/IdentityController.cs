@@ -25,6 +25,14 @@ namespace Skoruba.IdentityServer4.Admin.Controllers
         private readonly IIdentityService _identityService;
         private readonly IStringLocalizer<IdentityController> _localizer;
 
+        private static readonly string[] EmployeeStyle = new string[]
+        {
+            "工号",
+            "姓名"
+            // ,"身份证号"
+        };
+
+
         public IdentityController(IIdentityService identityService,
             ILogger<ConfigurationController> logger,
             IStringLocalizer<IdentityController> localizer) : base(logger)
@@ -393,9 +401,12 @@ namespace Skoruba.IdentityServer4.Admin.Controllers
                 IWorkbook workbook = WorkbookFactory.Create(memoryStream);
                 ISheet sheet = workbook.GetSheetAt(0);
                 IRow row = sheet.GetRow(0);
-                if (row.GetCell(0).ToString() != "工号" || row.GetCell(1).ToString() != "姓名" || row.GetCell(2).ToString() != "身份证号")
+                for (int i = 0; i < EmployeeStyle.Length; i++)
                 {
-                    return Content("模板与预期不一致");
+                    if (row.GetCell(i)?.ToString() != EmployeeStyle[i])
+                    {
+                        return Content("要导入的数据与预定模板不一致");
+                    }
                 }
 
                 Dictionary<string, EntityFramework.Entities.Employee> employeeDict = new Dictionary<string, EntityFramework.Entities.Employee>();
@@ -404,24 +415,29 @@ namespace Skoruba.IdentityServer4.Admin.Controllers
                     var tmpRow = sheet.GetRow(i);
                     var gh = tmpRow.GetCell(0)?.ToString();
                     var xm = tmpRow.GetCell(1)?.ToString();
-                    var sfz = tmpRow.GetCell(2)?.ToString();
+                    var sfhz = tmpRow.GetCell(2)?.ToString();
 
                     if (string.IsNullOrWhiteSpace(gh)
-                         || string.IsNullOrWhiteSpace(xm)
-                         || string.IsNullOrWhiteSpace(sfz))
+                         || string.IsNullOrWhiteSpace(xm))
                     {
-                        return Content("数据内容有误:工号、姓名、身份证均不能为空");
+                        return Content("数据内容有误:工号或姓名不能为空");
+                    }
+
+                    if (EmployeeStyle.Length > 2 && string.IsNullOrWhiteSpace(sfhz))
+                    {
+                        //要求身份证
+                        return Content("数据内容有误:身份证号不能为空");
                     }
 
                     if (!employeeDict.ContainsKey(gh))
                     {
-                        employeeDict.Add(gh, new EntityFramework.Entities.Employee { GH_工号 = gh, XM_姓名 = xm, SFZH_身份证号 = sfz });
+                        employeeDict.Add(gh, new EntityFramework.Entities.Employee { GH_工号 = gh.ToLower(), XM_姓名 = xm.ToLower(), SFZH_身份证号 = sfhz?.ToLower() });
                     }
                 }
 
                 if (employeeDict.Count == 0)
                 {
-                    return Content("数据内容为空");
+                    return Content("操作无效：数据内容为空");
                 }
 
                 var employeeList = employeeDict.Values.ToList();
