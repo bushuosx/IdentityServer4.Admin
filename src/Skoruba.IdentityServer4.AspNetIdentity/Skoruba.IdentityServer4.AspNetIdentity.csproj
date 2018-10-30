@@ -23,6 +23,9 @@
     <Content Update="Views\Account\ImportUser.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\Account\ResetPassword.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1YYServer_1json__JSONSchema="" appsettings_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>

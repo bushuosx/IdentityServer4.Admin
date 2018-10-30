@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Skoruba.IdentityServer4.AspNetIdentity.Quickstart.Account
 {
-    public class RegisterViewModel
+    public class ResetPasswordViewModel
     {
         [Required]
         [DisplayName("工号")]

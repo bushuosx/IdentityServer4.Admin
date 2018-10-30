@@ -28,6 +28,7 @@ using Skoruba.IdentityServer4.Admin.EntityFramework.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Skoruba.IdentityServer4.AspNetIdentity.Quickstart.Account;
+using System.Text.RegularExpressions;
 
 namespace IdentityServer4.Quickstart.UI
 {
@@ -364,7 +365,7 @@ namespace IdentityServer4.Quickstart.UI
                 var userExisted = await _userManager.FindByNameAsync(model.UserName);
                 if (userExisted != null)
                 {
-                    ModelState.AddModelError(nameof(model.UserName), "此工号已被注册");
+                    ModelState.AddModelError(nameof(model.UserName), "此工号已被激活过，请直接登录");
                     return View(model);
                 }
 
@@ -404,7 +405,7 @@ namespace IdentityServer4.Quickstart.UI
                     var ir = await _userManager.CreateAsync(user, model.Password);
                     if (ir.Succeeded)
                     {
-                        return RedirectToAction(nameof(Login),new { returnUrl=model.ReturnUrl});
+                        return RedirectToAction(nameof(Login), new { returnUrl = model.ReturnUrl });
                     }
                     else
                     {
@@ -417,6 +418,75 @@ namespace IdentityServer4.Quickstart.UI
             {
                 return View(model);
             }
+        }
+
+
+        //修改密码
+        public IActionResult ResetPassword(string returnUrl)
+        {
+            return View(new ResetPasswordViewModel { ReturnUrl = returnUrl });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(Skoruba.IdentityServer4.AspNetIdentity.Quickstart.Account.ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.UserName = model.UserName.ToLower();
+
+                var userExisted = await _userManager.FindByNameAsync(model.UserName);
+                if (userExisted == null)
+                {
+                    ModelState.AddModelError(nameof(model.UserName), "账号不存在");
+                    return View(model);
+                }
+                else if (userExisted.Email != model.Email)
+                {
+                    if (string.IsNullOrWhiteSpace(userExisted.Email))
+                    {
+                        ModelState.AddModelError(nameof(model.Email), "激活时填写的Email地址有误，请联系管理员。");
+                        return View(model);
+                    }
+                    else
+                    {
+                        System.Text.RegularExpressions.Regex regex = new Regex("(\\w)(\\s+)@(\\w)(\\s+)\\.(\\w+)");
+                        var match = regex.Match(userExisted.Email);
+                        var msg = string.Empty;
+                        if (match.Success)
+                        {
+                            msg = $"{match.Groups[1].Value}{new string('*', match.Groups[2].Value.Length)}@{match.Groups[3].Value}{new string('*', match.Groups[4].Value.Length)}.{match.Groups[5].Value}";
+                        }
+                        ModelState.AddModelError(nameof(model.Email), $"与激活时填写的地址不符：{msg}");
+                        return View(model);
+                    }
+                }
+                else
+                {
+                    var r = await _userManager.RemovePasswordAsync(userExisted);
+                    if (r.Succeeded)
+                    {
+                        var r2 = await _userManager.AddPasswordAsync(userExisted, model.Password);
+                        if (r2.Succeeded)
+                        {
+                            return RedirectToAction(nameof(Login), new { model.ReturnUrl });
+                        }
+                        else
+                        {
+                            _logger.LogWarning("设置用户密码失败：", string.Join(";", r.Errors.Select(x => x.Description)));
+                            ModelState.AddModelError("", "设置用户密码失败");
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogWarning("移除用户密码失败：", string.Join(";", r.Errors.Select(x => x.Description)));
+                        ModelState.AddModelError("", "移除用户密码失败");
+                    }
+                }
+            }
+
+            // something went wrong, show form with error
+            return View(model);
         }
 
         /*****************************************/
